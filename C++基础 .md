@@ -2199,20 +2199,52 @@ void test()
 
 1.模板的局限性：编写的函数模板很可能无法处理某些类型，另一方面，有时通用化是有意义的，但C++语法不允许这样做。为了解决这种问题，可以提供模板的重载，为这些特定的类型提供具体化的模板。
 
+## 模板的特化(具体化)
+
+为了解决这种问题，可以提供模板的重载，为这些特定的类型提供具体化的模板，称为模板的特化，模板特化有时也称之为模板的具体化。
+
 ```c++
 class Maker
 {
     public:
     Maker(string name,int age){
         this->age=age;
-        this->
+        this->name=name;
 	}
+    public:
+    string name;
+    int age;
+};
+template<class T>
+void myfunc(T &a,T &b)
+{
+    if(a>b){
+    }
+    else{
+    }
+        
+}
+//不建议具体化函数模板，因为没有通用性
+//具体化函数模板，注意上面的函数模板要有','才能具体化
+template<>void myfunc<Maker>(Maker &a,Maker &b)
+{
+    cout<<"函数模板的具体化"endl;
+    if(a.age>b.age)
+    {
+        cout<<"a>b"<<endl;
+    }
+    else
+    {
+        cout<<"a<=b"<<endl;
+    }
+}
+void test()
+{
+    Maker m1("aaa",10);
+    Maker m2("bbb",20);
+    myfunc(m1,m2);
 }
 ```
-
-## 模板的特化
-
-为了解决这种问题，可以提供模板的重载，为这些特定的类型提供具体化的模板，称为模板的特化，模板特化有时也称之为模板的具体化。
 
 ```c++
 #include<iostream>
@@ -2267,3 +2299,4 @@ int main(){
 
 ```
 
+#### [**p134**]
