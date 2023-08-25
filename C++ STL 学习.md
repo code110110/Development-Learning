@@ -536,7 +536,13 @@ for (auto &[k, v] : mp)
 
 #### (7) set/multiset：集合
 
-set/multiset又称集合，定义在<set>头文件中。set的特性是所有元素都会根据元素的键值自动被排序，set的元素不像map那样可以同时拥有键值和实值，set的元素既是键值又是实值，set不允许两个元素有相同的键值，因此总结来说就是set中的元素是有序且不重复的。multiset的特性和用法和set完全相同，唯一的区别在于multiset允许有重复元素，set和multiset的底层实现都是红黑树。
+set/multiset又称集合，定义在<set>头文件中。
+
+- set的特性是所有元素都会根据元素的键值自动被排序，set的元素不像map那样可以同时拥有键值和实值，set的元素既是键值又是实值。
+
+- set不允许两个元素有相同的键值，因此总结来说就是set中的元素是有序且不重复的。multiset的特性和用法和set完全相同，唯一的区别在于multiset允许有重复元素。
+- 数据结构：set和multiset的底层实现都是红黑树。
+- 迭代器：双向迭代器。
 
 - **set/multiset的定义方式：**
 
@@ -756,7 +762,7 @@ std::list<int>values(arr.begin()+2, arr.end());//拷贝arr容器中的{13,14,15}
 | sort()          | 通过更改容器中元素的位置，将它们进行排序。                   |
 | reverse()       | 反转容器中元素的顺序。                                       |
 
- 
+
 除此之外，[C++](http://c.biancheng.net/cplus/) 11 标准库还新增加了 begin() 和 end() 这 2 个函数，和 list 容器包含的 begin() 和 end() 成员函数不同，标准库提供的这 2 个函数的操作对象，既可以是容器，还可以是普通数组。当操作对象是容器时，它和容器包含的 begin() 和 end() 成员函数的功能完全相同；如果操作对象是普通数组，则 begin() 函数返回的是指向数组第一个元素的指针，同样 end() 返回指向数组中最后一个元素之后一个位置的指针（注意不是最后一个元素）。
 
 list 容器还有一个`std::swap(x , y)`非成员函数（其中 x 和 y 是存储相同类型元素的 list 容器），它和 swap() 成员函数的功能完全相同，仅使用语法上有差异。
@@ -814,6 +820,112 @@ values size：3
   - 3. 判断电梯条件，然后进电梯
   - 4. 判断出电梯条件，然后出电梯
   - 5. 打印出电梯喝进电梯人员的人数和姓名
+
+**案例2：**公司招聘了5个员工，5民员工进入公司后，需要指派员工在哪个部门工作，打印指派后的员工与对应的部门信息
+
+思路：
+
+1. ​	抽象员工
+2. ​	把未分组的员工放入vector容器中
+3. ​	把分组好的员工信息放入mutilmap中
+
+```c++
+#define _CRT_SECURE_WARNINGS
+#include<iostream>
+#include<string>
+#include<vector>
+#include<list>
+#include<map>
+using namespace std;
+
+#define SALE_DEPARMENT 1 //销售部
+#define DEVELOP_DEPARMENT 2 //研发部
+#define FINACIAL_DEPARMENT 3 //财务部
+
+class Woker
+{
+public:
+	string name;
+	int age;
+	int Salary;
+};
+//创建员工
+void CreateWoker(vector<Woker> &vWoker)
+{
+	srand((unsigned int)time(NULL));
+	string setName = "ABCDE";
+	for (int i = 0; i < 5; i++)
+	{
+		Woker woker;
+		woker.name = "员工";
+		woker.name += setName[i];
+		woker.age = rand() % 30 + 30;
+		woker.Salary = rand() % 20000 + 20000;
+		vWoker.push_back(woker);
+	}
+}
+//分组，把分好组的员工放入mWokers
+void WokerByGroup(vector<Woker>& vWoker, multimap<int, Woker>& mWokers)
+{
+	//遍历员工
+	for (vector<Woker>::iterator it=vWoker.begin();it!=vWoker.end();++it)
+	{
+		//生成部门编号
+		int id = rand() % 3 + 1;
+		//员工保存到mWokers
+		//mWokers[id] = *id;
+		mWokers.insert(make_pair(id, *it));
+	}
+}
+void myGroup(multimap<int,Woker> &mWokers,int id)
+{
+	//查寻id
+	multimap<int, Woker>::iterator it = mWokers.find(id);
+	//查询部门人数2
+	int mcount = mWokers.count(id);
+	//临时变量
+	int idx = 0;
+	for (; it != mWokers.end()&&idx<mcount; ++it,++idx);
+	{
+		cout << "Name:" << it->second.name << "Age:" << it->second.age << "Salary:" << it->second.Salary << endl;
+	}
+
+}
+//打印员工信息
+void PrintWoker(multimap<int, Woker>& mWokers)
+{
+	cout << "财务部门：" << endl;
+	myGroup(mWokers, FINACIAL_DEPARMENT);
+
+	cout << "研发部门:" << endl;
+	myGroup(mWokers, DEVELOP_DEPARMENT);
+
+	cout << "销售部门:" << endl;
+	myGroup(mWokers, SALE_DEPARMENT);
+}
+
+void test()
+{
+	//保存未分组的员工信息
+	vector<Woker> vWoker;
+	//保存分组后的员工信息
+	multimap<int, Woker> mWokers;
+
+	//创建员工
+	CreateWoker(vWoker);
+	//分组，把分好组的员工放入mWokers
+	WokerByGroup(vWoker,mWokers);
+
+
+}
+int main()
+{
+	test();
+	system("pause");
+	return EXIT_SUCCESS;
+
+}
+```
 
 
 
@@ -1225,11 +1337,83 @@ int main()
 
 
 
+## 函数对象
 
+### 1.什么是函数对象
 
+函数对象（仿函数）是一个类，不是一个函数。
 
+类中重载了“（）”操作符使得它可以像函数一样调用，这个类实例化的对象叫函数对象（仿函数）；
 
+分类：假定某个类有一个重载的operator（），而且重载的operator（）要求获取一个参数，这个类称为“一元仿函数”；
 
+相反，如果重载的operator（）要求获取两个参数，这个类称为“二元仿函数”
+
+### 2.作用
+
+1.作为算法的策略
+
+```c++
+vector<int> v;
+	v.push_back(8);
+	v.push_back(7);
+	v.push_back(5);
+	v.push_back(2);
+	v.push_back(1);
+	sort(v.begin(), v.end(), greater<int>());
+
+	for_each(v.begin(), v.end(), [](int val) {cout << val << ""; });
+	//[](int val) {cout << val << ""; }//匿名函数
+```
+
+### 3.函数对象与普通函数的区别
+
+	1. 函数对象可以有自己的状态
+	1. 普通函数没有类型，函数对象有类型
+	1. 函数对象比普通函数的执行效率可能更高（成员函数自动申请为内联函数）
+
+### 4.谓词
+
+谓词是指普通函数或者重载的operator（）返回值是bool类型的函数对象（仿函数）。如果operator接受一个参数则为一元谓词，接受两个参数则为二元谓词。
+
+谓词可作为一个判断式。
+
+```c++
+//4.谓词
+struct GeaterThanFive{
+	bool opeartor()(int v){
+		return v > 5;
+	}
+
+};
+//一元谓词
+void test01() {
+	vector<int>v;
+	for (int i = 0; i < 10; i++) {
+		v.push_back(i);
+	}
+}
+
+vector<int>::iterator ret = find_if(v.begin, v.end(), GeaterThanFive());
+if (ret == v.end()) {
+	cout << "没有找到！" << endl;
+}
+else {
+	cout << "找到：" << *ret << end;
+}
+```
+
+内建函数对象
+
+## 适配器
+
+### 函数适配器
+
+定义：
+
+什么是函数对象适配，当函数对象的参数不够用，那么可以用适配器来配置函数对象。
+
+函数适配器：bind1st,bind2nd；将二元函数对象配置为一元函数对象。
 
 
 
